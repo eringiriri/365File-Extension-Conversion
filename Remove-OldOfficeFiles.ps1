@@ -1,25 +1,25 @@
 <#
 .SYNOPSIS
-    å¤‰æ›æ¸ˆã¿ã®å¤ã„Officeå½¢å¼(doc, xls, ppt)ã‚’å‰Šé™¤ã™ã‚‹
+    •ÏŠ·Ï‚İ‚ÌŒÃ‚¢OfficeŒ`®(doc, xls, ppt)‚ğíœ‚·‚é
 
 .DESCRIPTION
-    å¯¾å¿œã™ã‚‹æ–°å½¢å¼(docx, xlsx, pptx)ãŒå­˜åœ¨ã™ã‚‹å ´åˆã®ã¿ã€å¤ã„å½¢å¼ã‚’å‰Šé™¤ã™ã‚‹
-    - å¼•æ•°ãªã—: ãƒ•ã‚©ãƒ«ãƒ€é¸æŠãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤º
-    - å¼•æ•°ã‚ã‚Š: ãƒ•ã‚©ãƒ«ãƒ€ã¾ãŸã¯ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æŒ‡å®š
+    ‘Î‰‚·‚éVŒ`®(docx, xlsx, pptx)‚ª‘¶İ‚·‚éê‡‚Ì‚İAŒÃ‚¢Œ`®‚ğíœ‚·‚é
+    - ˆø”‚È‚µ: ƒtƒHƒ‹ƒ_‘I‘ğƒ_ƒCƒAƒƒO‚ğ•\¦
+    - ˆø”‚ ‚è: ƒtƒHƒ‹ƒ_‚Ü‚½‚Íƒtƒ@ƒCƒ‹‚ğw’è
 
 .PARAMETER Path
-    å¯¾è±¡ã®ãƒ•ã‚©ãƒ«ãƒ€ã¾ãŸã¯ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹ï¼ˆè¤‡æ•°æŒ‡å®šå¯èƒ½ï¼‰
+    ‘ÎÛ‚ÌƒtƒHƒ‹ƒ_‚Ü‚½‚Íƒtƒ@ƒCƒ‹‚ÌƒpƒXi•¡”w’è‰Â”\j
 
 .PARAMETER Force
-    ç¢ºèªãªã—ã§å‰Šé™¤ã‚’å®Ÿè¡Œ
+    Šm”F‚È‚µ‚Åíœ‚ğÀs
 
 .EXAMPLE
     .\Remove-OldOfficeFiles.ps1
-    # ãƒ•ã‚©ãƒ«ãƒ€é¸æŠãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãŒè¡¨ç¤ºã•ã‚Œã‚‹
+    # ƒtƒHƒ‹ƒ_‘I‘ğƒ_ƒCƒAƒƒO‚ª•\¦‚³‚ê‚é
 
 .EXAMPLE
     .\Remove-OldOfficeFiles.ps1 -Path "C:\Documents" -Force
-    # ç¢ºèªãªã—ã§å‰Šé™¤
+    # Šm”F‚È‚µ‚Åíœ
 #>
 
 param(
@@ -29,19 +29,19 @@ param(
     [switch]$Force
 )
 
-# çµæœé›†è¨ˆç”¨
+# Œ‹‰ÊWŒv—p
 $script:deleteCount = 0
 $script:skipCount = 0
 $script:errorCount = 0
 $script:filesToDelete = @()
 
 #------------------------------------------------------------------------------
-# ãƒ•ã‚©ãƒ«ãƒ€é¸æŠãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤º
+# ƒtƒHƒ‹ƒ_‘I‘ğƒ_ƒCƒAƒƒO‚ğ•\¦
 #------------------------------------------------------------------------------
 function Show-FolderDialog {
     Add-Type -AssemblyName System.Windows.Forms
     $dialog = New-Object System.Windows.Forms.FolderBrowserDialog
-    $dialog.Description = "å¯¾è±¡ã®ãƒ•ã‚©ãƒ«ãƒ€ã‚’é¸æŠã—ã¦ãã ã•ã„"
+    $dialog.Description = "‘ÎÛ‚ÌƒtƒHƒ‹ƒ_‚ğ‘I‘ğ‚µ‚Ä‚­‚¾‚³‚¢"
     $dialog.ShowNewFolderButton = $false
 
     if ($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
@@ -51,7 +51,7 @@ function Show-FolderDialog {
 }
 
 #------------------------------------------------------------------------------
-# æ–°å½¢å¼ãŒå­˜åœ¨ã™ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
+# VŒ`®‚ª‘¶İ‚·‚é‚©ƒ`ƒFƒbƒN
 #------------------------------------------------------------------------------
 function Test-NewFormatExists {
     param([string]$FilePath)
@@ -73,7 +73,7 @@ function Test-NewFormatExists {
 }
 
 #------------------------------------------------------------------------------
-# ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒã‚§ãƒƒã‚¯ã—ã¦å‰Šé™¤å€™è£œã«è¿½åŠ 
+# ƒtƒ@ƒCƒ‹‚ğƒ`ƒFƒbƒN‚µ‚ÄíœŒó•â‚É’Ç‰Á
 #------------------------------------------------------------------------------
 function Check-File {
     param([string]$FilePath)
@@ -86,31 +86,31 @@ function Check-File {
 
     if (Test-NewFormatExists -FilePath $FilePath) {
         $script:filesToDelete += $FilePath
-        Write-Host "  å‰Šé™¤å¯¾è±¡: $FilePath" -ForegroundColor Yellow
+        Write-Host "  íœ‘ÎÛ: $FilePath" -ForegroundColor Yellow
     }
     else {
         $script:skipCount++
-        Write-Host "  ã‚¹ã‚­ãƒƒãƒ—ï¼ˆæ–°å½¢å¼ãªã—ï¼‰: $FilePath" -ForegroundColor Gray
+        Write-Host "  ƒXƒLƒbƒviVŒ`®‚È‚µj: $FilePath" -ForegroundColor Gray
     }
 }
 
 #------------------------------------------------------------------------------
-# ãƒ•ã‚©ãƒ«ãƒ€å†…ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒã‚§ãƒƒã‚¯
+# ƒtƒHƒ‹ƒ_“à‚Ìƒtƒ@ƒCƒ‹‚ğƒ`ƒFƒbƒN
 #------------------------------------------------------------------------------
 function Check-Folder {
     param([string]$FolderPath)
 
-    Write-Host "`nãƒ•ã‚©ãƒ«ãƒ€ã‚’æ¤œç´¢ä¸­: $FolderPath" -ForegroundColor Cyan
+    Write-Host "`nƒtƒHƒ‹ƒ_‚ğŒŸõ’†: $FolderPath" -ForegroundColor Cyan
 
     $files = Get-ChildItem -Path $FolderPath -Recurse -File |
              Where-Object { $_.Extension -eq ".doc" -or $_.Extension -eq ".xls" -or $_.Extension -eq ".ppt" }
 
     if ($files.Count -eq 0) {
-        Write-Host "å¯¾è±¡ã®ãƒ•ã‚¡ã‚¤ãƒ«ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚" -ForegroundColor Yellow
+        Write-Host "‘ÎÛ‚Ìƒtƒ@ƒCƒ‹‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½B" -ForegroundColor Yellow
         return
     }
 
-    Write-Host "ãƒã‚§ãƒƒã‚¯å¯¾è±¡: $($files.Count) ä»¶`n"
+    Write-Host "ƒ`ƒFƒbƒN‘ÎÛ: $($files.Count) Œ`n"
 
     foreach ($file in $files) {
         Check-File -FilePath $file.FullName
@@ -118,39 +118,39 @@ function Check-Folder {
 }
 
 #------------------------------------------------------------------------------
-# å‰Šé™¤ã‚’å®Ÿè¡Œ
+# íœ‚ğÀs
 #------------------------------------------------------------------------------
 function Remove-Files {
     foreach ($filePath in $script:filesToDelete) {
         try {
             Remove-Item -Path $filePath -Force
-            Write-Host "  å‰Šé™¤å®Œäº†: $filePath" -ForegroundColor Green
+            Write-Host "  íœŠ®—¹: $filePath" -ForegroundColor Green
             $script:deleteCount++
         }
         catch {
-            Write-Host "  å‰Šé™¤å¤±æ•—: $filePath - $($_.Exception.Message)" -ForegroundColor Red
+            Write-Host "  íœ¸”s: $filePath - $($_.Exception.Message)" -ForegroundColor Red
             $script:errorCount++
         }
     }
 }
 
 #------------------------------------------------------------------------------
-# ãƒ¡ã‚¤ãƒ³å‡¦ç†
+# ƒƒCƒ“ˆ—
 #------------------------------------------------------------------------------
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host " å¤ã„Officeå½¢å¼ å‰Šé™¤ãƒ„ãƒ¼ãƒ«" -ForegroundColor Cyan
-Write-Host " (docx/xlsx/pptxãŒå­˜åœ¨ã™ã‚‹å ´åˆã®ã¿å‰Šé™¤)" -ForegroundColor Cyan
+Write-Host " ŒÃ‚¢OfficeŒ`® íœƒc[ƒ‹" -ForegroundColor Cyan
+Write-Host " (docx/xlsx/pptx‚ª‘¶İ‚·‚éê‡‚Ì‚İíœ)" -ForegroundColor Cyan
 Write-Host "========================================`n" -ForegroundColor Cyan
 
-# ãƒ‘ã‚¹ã®å–å¾—
+# ƒpƒX‚Ìæ“¾
 $targetPaths = @()
 $cancelled = $false
 
 if ($null -eq $Path -or $Path.Count -eq 0) {
     $selectedPath = Show-FolderDialog
     if ($null -eq $selectedPath) {
-        Write-Host "ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã•ã‚Œã¾ã—ãŸã€‚" -ForegroundColor Yellow
+        Write-Host "ƒLƒƒƒ“ƒZƒ‹‚³‚ê‚Ü‚µ‚½B" -ForegroundColor Yellow
         $cancelled = $true
     }
     else {
@@ -162,10 +162,10 @@ else {
 }
 
 if (-not $cancelled) {
-    # å„ãƒ‘ã‚¹ã‚’ãƒã‚§ãƒƒã‚¯
+    # ŠeƒpƒX‚ğƒ`ƒFƒbƒN
     foreach ($targetPath in $targetPaths) {
         if (-not (Test-Path $targetPath)) {
-            Write-Host "ãƒ‘ã‚¹ãŒå­˜åœ¨ã—ã¾ã›ã‚“: $targetPath" -ForegroundColor Red
+            Write-Host "ƒpƒX‚ª‘¶İ‚µ‚Ü‚¹‚ñ: $targetPath" -ForegroundColor Red
             continue
         }
 
@@ -177,41 +177,41 @@ if (-not $cancelled) {
         }
     }
 
-    # å‰Šé™¤å€™è£œãŒãªã„å ´åˆ
+    # íœŒó•â‚ª‚È‚¢ê‡
     if ($script:filesToDelete.Count -eq 0) {
-        Write-Host "`nå‰Šé™¤å¯¾è±¡ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚" -ForegroundColor Yellow
+        Write-Host "`níœ‘ÎÛ‚Ìƒtƒ@ƒCƒ‹‚Í‚ ‚è‚Ü‚¹‚ñB" -ForegroundColor Yellow
     }
     else {
-        # å‰Šé™¤ç¢ºèª
+        # íœŠm”F
         Write-Host "`n----------------------------------------" -ForegroundColor Cyan
-        Write-Host "å‰Šé™¤å¯¾è±¡: $($script:filesToDelete.Count) ä»¶" -ForegroundColor Yellow
+        Write-Host "íœ‘ÎÛ: $($script:filesToDelete.Count) Œ" -ForegroundColor Yellow
 
         $doDelete = $true
         if (-not $Force) {
-            $response = Read-Host "`nã“ã‚Œã‚‰ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å‰Šé™¤ã—ã¾ã™ã‹ï¼Ÿ (y/n)"
+            $response = Read-Host "`n‚±‚ê‚ç‚Ìƒtƒ@ƒCƒ‹‚ğíœ‚µ‚Ü‚·‚©H (y/n)"
             if ($response -ne "y") {
-                Write-Host "ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã•ã‚Œã¾ã—ãŸã€‚" -ForegroundColor Yellow
+                Write-Host "ƒLƒƒƒ“ƒZƒ‹‚³‚ê‚Ü‚µ‚½B" -ForegroundColor Yellow
                 $doDelete = $false
             }
         }
 
         if ($doDelete) {
-            Write-Host "`nå‰Šé™¤ã‚’å®Ÿè¡Œä¸­...`n" -ForegroundColor Cyan
+            Write-Host "`níœ‚ğÀs’†...`n" -ForegroundColor Cyan
             Remove-Files
 
-            # çµæœè¡¨ç¤º
+            # Œ‹‰Ê•\¦
             Write-Host "`n========================================" -ForegroundColor Cyan
-            Write-Host " å‡¦ç†çµæœ" -ForegroundColor Cyan
+            Write-Host " ˆ—Œ‹‰Ê" -ForegroundColor Cyan
             Write-Host "========================================" -ForegroundColor Cyan
-            Write-Host "å‰Šé™¤: $script:deleteCount ä»¶" -ForegroundColor Green
-            Write-Host "ã‚¹ã‚­ãƒƒãƒ—: $script:skipCount ä»¶" -ForegroundColor Yellow
-            Write-Host "ã‚¨ãƒ©ãƒ¼: $script:errorCount ä»¶" -ForegroundColor Red
+            Write-Host "íœ: $script:deleteCount Œ" -ForegroundColor Green
+            Write-Host "ƒXƒLƒbƒv: $script:skipCount Œ" -ForegroundColor Yellow
+            Write-Host "ƒGƒ‰[: $script:errorCount Œ" -ForegroundColor Red
 
-            Write-Host "`nå‡¦ç†ãŒå®Œäº†ã—ã¾ã—ãŸã€‚"
+            Write-Host "`nˆ—‚ªŠ®—¹‚µ‚Ü‚µ‚½B"
         }
     }
 }
 
-# çµ‚äº†æ™‚ã¯å¿…ãšã“ã“ã‚’é€šã‚‹
+# I—¹‚Í•K‚¸‚±‚±‚ğ’Ê‚é
 Write-Host ""
 pause
