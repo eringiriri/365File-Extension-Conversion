@@ -145,61 +145,73 @@ Write-Host "========================================`n" -ForegroundColor Cyan
 
 # パスの取得
 $targetPaths = @()
+$cancelled = $false
 
 if ($null -eq $Path -or $Path.Count -eq 0) {
     $selectedPath = Show-FolderDialog
     if ($null -eq $selectedPath) {
         Write-Host "キャンセルされました。" -ForegroundColor Yellow
-        exit 0
+        $cancelled = $true
     }
-    $targetPaths += $selectedPath
+    else {
+        $targetPaths += $selectedPath
+    }
 }
 else {
     $targetPaths = $Path
 }
 
-# 各パスをチェック
-foreach ($targetPath in $targetPaths) {
-    if (-not (Test-Path $targetPath)) {
-        Write-Host "パスが存在しません: $targetPath" -ForegroundColor Red
-        continue
+if (-not $cancelled) {
+    # 各パスをチェック
+    foreach ($targetPath in $targetPaths) {
+        if (-not (Test-Path $targetPath)) {
+            Write-Host "パスが存在しません: $targetPath" -ForegroundColor Red
+            continue
+        }
+
+        if (Test-Path $targetPath -PathType Container) {
+            Check-Folder -FolderPath $targetPath
+        }
+        else {
+            Check-File -FilePath $targetPath
+        }
     }
 
-    if (Test-Path $targetPath -PathType Container) {
-        Check-Folder -FolderPath $targetPath
+    # 削除候補がない場合
+    if ($script:filesToDelete.Count -eq 0) {
+        Write-Host "`n削除対象のファイルはありません。" -ForegroundColor Yellow
     }
     else {
-        Check-File -FilePath $targetPath
+        # 削除確認
+        Write-Host "`n----------------------------------------" -ForegroundColor Cyan
+        Write-Host "削除対象: $($script:filesToDelete.Count) 件" -ForegroundColor Yellow
+
+        $doDelete = $true
+        if (-not $Force) {
+            $response = Read-Host "`nこれらのファイルを削除しますか？ (y/n)"
+            if ($response -ne "y") {
+                Write-Host "キャンセルされました。" -ForegroundColor Yellow
+                $doDelete = $false
+            }
+        }
+
+        if ($doDelete) {
+            Write-Host "`n削除を実行中...`n" -ForegroundColor Cyan
+            Remove-Files
+
+            # 結果表示
+            Write-Host "`n========================================" -ForegroundColor Cyan
+            Write-Host " 処理結果" -ForegroundColor Cyan
+            Write-Host "========================================" -ForegroundColor Cyan
+            Write-Host "削除: $script:deleteCount 件" -ForegroundColor Green
+            Write-Host "スキップ: $script:skipCount 件" -ForegroundColor Yellow
+            Write-Host "エラー: $script:errorCount 件" -ForegroundColor Red
+
+            Write-Host "`n処理が完了しました。"
+        }
     }
 }
 
-# 削除候補がない場合
-if ($script:filesToDelete.Count -eq 0) {
-    Write-Host "`n削除対象のファイルはありません。" -ForegroundColor Yellow
-    exit 0
-}
-
-# 削除確認
-Write-Host "`n----------------------------------------" -ForegroundColor Cyan
-Write-Host "削除対象: $($script:filesToDelete.Count) 件" -ForegroundColor Yellow
-
-if (-not $Force) {
-    $response = Read-Host "`nこれらのファイルを削除しますか？ (y/n)"
-    if ($response -ne "y") {
-        Write-Host "キャンセルされました。" -ForegroundColor Yellow
-        exit 0
-    }
-}
-
-Write-Host "`n削除を実行中...`n" -ForegroundColor Cyan
-Remove-Files
-
-# 結果表示
-Write-Host "`n========================================" -ForegroundColor Cyan
-Write-Host " 処理結果" -ForegroundColor Cyan
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "削除: $script:deleteCount 件" -ForegroundColor Green
-Write-Host "スキップ: $script:skipCount 件" -ForegroundColor Yellow
-Write-Host "エラー: $script:errorCount 件" -ForegroundColor Red
-
-Write-Host "`n処理が完了しました。"
+# 終了時は必ずここを通る
+Write-Host ""
+pause
