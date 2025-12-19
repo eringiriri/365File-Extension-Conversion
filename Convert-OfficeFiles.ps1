@@ -258,54 +258,63 @@ Write-Host "========================================`n" -ForegroundColor Cyan
 
 # パスの取得
 $targetPaths = @()
+$cancelled = $false
 
 if ($null -eq $Path -or $Path.Count -eq 0) {
     # 引数なし: ダイアログ表示
     $selectedPath = Show-FolderDialog
     if ($null -eq $selectedPath) {
         Write-Host "キャンセルされました。" -ForegroundColor Yellow
-        exit 0
+        $cancelled = $true
     }
-    $targetPaths += $selectedPath
+    else {
+        $targetPaths += $selectedPath
+    }
 }
 else {
     $targetPaths = $Path
 }
 
 # 各パスを処理
-foreach ($targetPath in $targetPaths) {
-    if (-not (Test-Path $targetPath)) {
-        Write-Host "パスが存在しません: $targetPath" -ForegroundColor Red
-        continue
+if (-not $cancelled) {
+    foreach ($targetPath in $targetPaths) {
+        if (-not (Test-Path $targetPath)) {
+            Write-Host "パスが存在しません: $targetPath" -ForegroundColor Red
+            continue
+        }
+
+        if (Test-Path $targetPath -PathType Container) {
+            # フォルダの場合
+            Convert-Folder -FolderPath $targetPath
+        }
+        else {
+            # ファイルの場合
+            Convert-File -FilePath $targetPath
+        }
     }
 
-    if (Test-Path $targetPath -PathType Container) {
-        # フォルダの場合
-        Convert-Folder -FolderPath $targetPath
+    # ガベージコレクション
+    [System.GC]::Collect()
+    [System.GC]::WaitForPendingFinalizers()
+
+    # 結果表示
+    Write-Host "`n========================================" -ForegroundColor Cyan
+    Write-Host " 処理結果" -ForegroundColor Cyan
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host "成功: $script:successCount 件" -ForegroundColor Green
+    Write-Host "スキップ: $script:skipCount 件" -ForegroundColor Yellow
+    Write-Host "エラー: $script:errorCount 件" -ForegroundColor Red
+
+    if ($script:errorFiles.Count -gt 0) {
+        Write-Host "`nエラーが発生したファイル:" -ForegroundColor Red
+        foreach ($f in $script:errorFiles) {
+            Write-Host "  - $f" -ForegroundColor Red
+        }
     }
-    else {
-        # ファイルの場合
-        Convert-File -FilePath $targetPath
-    }
+
+    Write-Host "`n処理が完了しました。"
 }
 
-# ガベージコレクション
-[System.GC]::Collect()
-[System.GC]::WaitForPendingFinalizers()
-
-# 結果表示
-Write-Host "`n========================================" -ForegroundColor Cyan
-Write-Host " 処理結果" -ForegroundColor Cyan
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "成功: $script:successCount 件" -ForegroundColor Green
-Write-Host "スキップ: $script:skipCount 件" -ForegroundColor Yellow
-Write-Host "エラー: $script:errorCount 件" -ForegroundColor Red
-
-if ($script:errorFiles.Count -gt 0) {
-    Write-Host "`nエラーが発生したファイル:" -ForegroundColor Red
-    foreach ($f in $script:errorFiles) {
-        Write-Host "  - $f" -ForegroundColor Red
-    }
-}
-
-Write-Host "`n処理が完了しました。"
+# 終了時は必ずここを通る
+Write-Host ""
+pause
