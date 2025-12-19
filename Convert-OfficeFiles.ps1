@@ -1,25 +1,25 @@
 <#
 .SYNOPSIS
-    å¤ã„Officeå½¢å¼(doc, xls, ppt)ã‚’æ–°å½¢å¼(docx, xlsx, pptx)ã«å¤‰æ›ã™ã‚‹
+    ŒÃ‚¢OfficeŒ`®(doc, xls, ppt)‚ğVŒ`®(docx, xlsx, pptx)‚É•ÏŠ·‚·‚é
 
 .DESCRIPTION
-    - å¼•æ•°ãªã—: ãƒ•ã‚©ãƒ«ãƒ€é¸æŠãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤º
-    - å¼•æ•°ã‚ã‚Š: ãƒ•ã‚©ãƒ«ãƒ€ã¾ãŸã¯ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æŒ‡å®šã—ã¦å¤‰æ›
+    - ˆø”‚È‚µ: ƒtƒHƒ‹ƒ_‘I‘ğƒ_ƒCƒAƒƒO‚ğ•\¦
+    - ˆø”‚ ‚è: ƒtƒHƒ‹ƒ_‚Ü‚½‚Íƒtƒ@ƒCƒ‹‚ğw’è‚µ‚Ä•ÏŠ·
 
 .PARAMETER Path
-    å¤‰æ›å¯¾è±¡ã®ãƒ•ã‚©ãƒ«ãƒ€ã¾ãŸã¯ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹ï¼ˆè¤‡æ•°æŒ‡å®šå¯èƒ½ï¼‰
+    •ÏŠ·‘ÎÛ‚ÌƒtƒHƒ‹ƒ_‚Ü‚½‚Íƒtƒ@ƒCƒ‹‚ÌƒpƒXi•¡”w’è‰Â”\j
 
 .EXAMPLE
     .\Convert-OfficeFiles.ps1
-    # ãƒ•ã‚©ãƒ«ãƒ€é¸æŠãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãŒè¡¨ç¤ºã•ã‚Œã‚‹
+    # ƒtƒHƒ‹ƒ_‘I‘ğƒ_ƒCƒAƒƒO‚ª•\¦‚³‚ê‚é
 
 .EXAMPLE
     .\Convert-OfficeFiles.ps1 -Path "C:\Documents"
-    # æŒ‡å®šãƒ•ã‚©ãƒ«ãƒ€å†…ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å¤‰æ›
+    # w’èƒtƒHƒ‹ƒ_“à‚Ìƒtƒ@ƒCƒ‹‚ğ•ÏŠ·
 
 .EXAMPLE
     .\Convert-OfficeFiles.ps1 -Path "C:\test.xls", "C:\test2.doc"
-    # æŒ‡å®šãƒ•ã‚¡ã‚¤ãƒ«ã‚’å¤‰æ›
+    # w’èƒtƒ@ƒCƒ‹‚ğ•ÏŠ·
 #>
 
 param(
@@ -27,24 +27,24 @@ param(
     [string[]]$Path
 )
 
-# ä¿å­˜å½¢å¼ã®å®šæ•°
+# •Û‘¶Œ`®‚Ì’è”
 $wdFormatDocumentDefault = 16        # Word: docx
 $xlOpenXMLWorkbook = 51              # Excel: xlsx
 $ppSaveAsOpenXMLPresentation = 24    # PowerPoint: pptx
 
-# çµæœé›†è¨ˆç”¨
+# Œ‹‰ÊWŒv—p
 $script:successCount = 0
 $script:errorCount = 0
 $script:skipCount = 0
 $script:errorFiles = @()
 
 #------------------------------------------------------------------------------
-# ãƒ•ã‚©ãƒ«ãƒ€é¸æŠãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤º
+# ƒtƒHƒ‹ƒ_‘I‘ğƒ_ƒCƒAƒƒO‚ğ•\¦
 #------------------------------------------------------------------------------
 function Show-FolderDialog {
     Add-Type -AssemblyName System.Windows.Forms
     $dialog = New-Object System.Windows.Forms.FolderBrowserDialog
-    $dialog.Description = "å¤‰æ›å¯¾è±¡ã®ãƒ•ã‚©ãƒ«ãƒ€ã‚’é¸æŠã—ã¦ãã ã•ã„"
+    $dialog.Description = "•ÏŠ·‘ÎÛ‚ÌƒtƒHƒ‹ƒ_‚ğ‘I‘ğ‚µ‚Ä‚­‚¾‚³‚¢"
     $dialog.ShowNewFolderButton = $false
 
     if ($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
@@ -54,7 +54,7 @@ function Show-FolderDialog {
 }
 
 #------------------------------------------------------------------------------
-# COMã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å®‰å…¨ã«è§£æ”¾
+# COMƒIƒuƒWƒFƒNƒg‚ğˆÀ‘S‚É‰ğ•ú
 #------------------------------------------------------------------------------
 function Release-ComObject {
     param([object]$obj)
@@ -67,7 +67,7 @@ function Release-ComObject {
 }
 
 #------------------------------------------------------------------------------
-# Wordãƒ•ã‚¡ã‚¤ãƒ«ã‚’å¤‰æ› (doc â†’ docx)
+# Wordƒtƒ@ƒCƒ‹‚ğ•ÏŠ· (doc ¨ docx)
 #------------------------------------------------------------------------------
 function Convert-WordFile {
     param([string]$FilePath)
@@ -78,9 +78,9 @@ function Convert-WordFile {
     try {
         $outputPath = [System.IO.Path]::ChangeExtension($FilePath, ".docx")
 
-        # æ—¢å­˜ãƒ•ã‚¡ã‚¤ãƒ«ãƒã‚§ãƒƒã‚¯
+        # Šù‘¶ƒtƒ@ƒCƒ‹ƒ`ƒFƒbƒN
         if (Test-Path $outputPath) {
-            Write-Host "  ã‚¹ã‚­ãƒƒãƒ—: å‡ºåŠ›å…ˆãŒæ—¢ã«å­˜åœ¨ - $outputPath" -ForegroundColor Yellow
+            Write-Host "  ƒXƒLƒbƒv: o—Íæ‚ªŠù‚É‘¶İ - $outputPath" -ForegroundColor Yellow
             $script:skipCount++
             return
         }
@@ -93,11 +93,11 @@ function Convert-WordFile {
         $doc.SaveAs2([ref]$outputPath, [ref]$wdFormatDocumentDefault)
         $doc.Close($false)
 
-        Write-Host "  å®Œäº†: $outputPath" -ForegroundColor Green
+        Write-Host "  Š®—¹: $outputPath" -ForegroundColor Green
         $script:successCount++
     }
     catch {
-        Write-Host "  ã‚¨ãƒ©ãƒ¼: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "  ƒGƒ‰[: $($_.Exception.Message)" -ForegroundColor Red
         $script:errorCount++
         $script:errorFiles += $FilePath
     }
@@ -113,7 +113,7 @@ function Convert-WordFile {
 }
 
 #------------------------------------------------------------------------------
-# Excelãƒ•ã‚¡ã‚¤ãƒ«ã‚’å¤‰æ› (xls â†’ xlsx)
+# Excelƒtƒ@ƒCƒ‹‚ğ•ÏŠ· (xls ¨ xlsx)
 #------------------------------------------------------------------------------
 function Convert-ExcelFile {
     param([string]$FilePath)
@@ -124,9 +124,9 @@ function Convert-ExcelFile {
     try {
         $outputPath = [System.IO.Path]::ChangeExtension($FilePath, ".xlsx")
 
-        # æ—¢å­˜ãƒ•ã‚¡ã‚¤ãƒ«ãƒã‚§ãƒƒã‚¯
+        # Šù‘¶ƒtƒ@ƒCƒ‹ƒ`ƒFƒbƒN
         if (Test-Path $outputPath) {
-            Write-Host "  ã‚¹ã‚­ãƒƒãƒ—: å‡ºåŠ›å…ˆãŒæ—¢ã«å­˜åœ¨ - $outputPath" -ForegroundColor Yellow
+            Write-Host "  ƒXƒLƒbƒv: o—Íæ‚ªŠù‚É‘¶İ - $outputPath" -ForegroundColor Yellow
             $script:skipCount++
             return
         }
@@ -139,11 +139,11 @@ function Convert-ExcelFile {
         $workbook.SaveAs($outputPath, $xlOpenXMLWorkbook)
         $workbook.Close($false)
 
-        Write-Host "  å®Œäº†: $outputPath" -ForegroundColor Green
+        Write-Host "  Š®—¹: $outputPath" -ForegroundColor Green
         $script:successCount++
     }
     catch {
-        Write-Host "  ã‚¨ãƒ©ãƒ¼: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "  ƒGƒ‰[: $($_.Exception.Message)" -ForegroundColor Red
         $script:errorCount++
         $script:errorFiles += $FilePath
     }
@@ -159,7 +159,7 @@ function Convert-ExcelFile {
 }
 
 #------------------------------------------------------------------------------
-# PowerPointãƒ•ã‚¡ã‚¤ãƒ«ã‚’å¤‰æ› (ppt â†’ pptx)
+# PowerPointƒtƒ@ƒCƒ‹‚ğ•ÏŠ· (ppt ¨ pptx)
 #------------------------------------------------------------------------------
 function Convert-PowerPointFile {
     param([string]$FilePath)
@@ -170,25 +170,25 @@ function Convert-PowerPointFile {
     try {
         $outputPath = [System.IO.Path]::ChangeExtension($FilePath, ".pptx")
 
-        # æ—¢å­˜ãƒ•ã‚¡ã‚¤ãƒ«ãƒã‚§ãƒƒã‚¯
+        # Šù‘¶ƒtƒ@ƒCƒ‹ƒ`ƒFƒbƒN
         if (Test-Path $outputPath) {
-            Write-Host "  ã‚¹ã‚­ãƒƒãƒ—: å‡ºåŠ›å…ˆãŒæ—¢ã«å­˜åœ¨ - $outputPath" -ForegroundColor Yellow
+            Write-Host "  ƒXƒLƒbƒv: o—Íæ‚ªŠù‚É‘¶İ - $outputPath" -ForegroundColor Yellow
             $script:skipCount++
             return
         }
 
         $powerpoint = New-Object -ComObject PowerPoint.Application
-        # PowerPointã¯Visible=$falseã«ã§ããªã„å ´åˆãŒã‚ã‚‹
+        # PowerPoint‚ÍVisible=$false‚É‚Å‚«‚È‚¢ê‡‚ª‚ ‚é
 
         $presentation = $powerpoint.Presentations.Open($FilePath, $true, $false, $false)
         $presentation.SaveAs($outputPath, $ppSaveAsOpenXMLPresentation)
         $presentation.Close()
 
-        Write-Host "  å®Œäº†: $outputPath" -ForegroundColor Green
+        Write-Host "  Š®—¹: $outputPath" -ForegroundColor Green
         $script:successCount++
     }
     catch {
-        Write-Host "  ã‚¨ãƒ©ãƒ¼: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "  ƒGƒ‰[: $($_.Exception.Message)" -ForegroundColor Red
         $script:errorCount++
         $script:errorFiles += $FilePath
     }
@@ -204,43 +204,43 @@ function Convert-PowerPointFile {
 }
 
 #------------------------------------------------------------------------------
-# ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å¤‰æ›ï¼ˆæ‹¡å¼µå­ã§æŒ¯ã‚Šåˆ†ã‘ï¼‰
+# ƒtƒ@ƒCƒ‹‚ğ•ÏŠ·iŠg’£q‚ÅU‚è•ª‚¯j
 #------------------------------------------------------------------------------
 function Convert-File {
     param([string]$FilePath)
 
     $extension = [System.IO.Path]::GetExtension($FilePath).ToLower()
 
-    Write-Host "å¤‰æ›ä¸­: $FilePath"
+    Write-Host "•ÏŠ·’†: $FilePath"
 
     switch ($extension) {
         ".doc" { Convert-WordFile -FilePath $FilePath }
         ".xls" { Convert-ExcelFile -FilePath $FilePath }
         ".ppt" { Convert-PowerPointFile -FilePath $FilePath }
         default {
-            Write-Host "  ã‚¹ã‚­ãƒƒãƒ—: å¯¾è±¡å¤–ã®æ‹¡å¼µå­" -ForegroundColor Yellow
+            Write-Host "  ƒXƒLƒbƒv: ‘ÎÛŠO‚ÌŠg’£q" -ForegroundColor Yellow
             $script:skipCount++
         }
     }
 }
 
 #------------------------------------------------------------------------------
-# ãƒ•ã‚©ãƒ«ãƒ€å†…ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å¤‰æ›
+# ƒtƒHƒ‹ƒ_“à‚Ìƒtƒ@ƒCƒ‹‚ğ•ÏŠ·
 #------------------------------------------------------------------------------
 function Convert-Folder {
     param([string]$FolderPath)
 
-    Write-Host "`nãƒ•ã‚©ãƒ«ãƒ€ã‚’æ¤œç´¢ä¸­: $FolderPath" -ForegroundColor Cyan
+    Write-Host "`nƒtƒHƒ‹ƒ_‚ğŒŸõ’†: $FolderPath" -ForegroundColor Cyan
 
     $files = Get-ChildItem -Path $FolderPath -Recurse -File |
              Where-Object { $_.Extension -eq ".doc" -or $_.Extension -eq ".xls" -or $_.Extension -eq ".ppt" }
 
     if ($files.Count -eq 0) {
-        Write-Host "å¤‰æ›å¯¾è±¡ã®ãƒ•ã‚¡ã‚¤ãƒ«ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚" -ForegroundColor Yellow
+        Write-Host "•ÏŠ·‘ÎÛ‚Ìƒtƒ@ƒCƒ‹‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½B" -ForegroundColor Yellow
         return
     }
 
-    Write-Host "å¯¾è±¡ãƒ•ã‚¡ã‚¤ãƒ«æ•°: $($files.Count)`n"
+    Write-Host "‘ÎÛƒtƒ@ƒCƒ‹”: $($files.Count)`n"
 
     foreach ($file in $files) {
         Convert-File -FilePath $file.FullName
@@ -248,23 +248,23 @@ function Convert-Folder {
 }
 
 #------------------------------------------------------------------------------
-# ãƒ¡ã‚¤ãƒ³å‡¦ç†
+# ƒƒCƒ“ˆ—
 #------------------------------------------------------------------------------
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host " Officeå½¢å¼å¤‰æ›ãƒ„ãƒ¼ãƒ«" -ForegroundColor Cyan
-Write-Host " docâ†’docx, xlsâ†’xlsx, pptâ†’pptx" -ForegroundColor Cyan
+Write-Host " OfficeŒ`®•ÏŠ·ƒc[ƒ‹" -ForegroundColor Cyan
+Write-Host " doc¨docx, xls¨xlsx, ppt¨pptx" -ForegroundColor Cyan
 Write-Host "========================================`n" -ForegroundColor Cyan
 
-# ãƒ‘ã‚¹ã®å–å¾—
+# ƒpƒX‚Ìæ“¾
 $targetPaths = @()
 $cancelled = $false
 
 if ($null -eq $Path -or $Path.Count -eq 0) {
-    # å¼•æ•°ãªã—: ãƒ€ã‚¤ã‚¢ãƒ­ã‚°è¡¨ç¤º
+    # ˆø”‚È‚µ: ƒ_ƒCƒAƒƒO•\¦
     $selectedPath = Show-FolderDialog
     if ($null -eq $selectedPath) {
-        Write-Host "ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã•ã‚Œã¾ã—ãŸã€‚" -ForegroundColor Yellow
+        Write-Host "ƒLƒƒƒ“ƒZƒ‹‚³‚ê‚Ü‚µ‚½B" -ForegroundColor Yellow
         $cancelled = $true
     }
     else {
@@ -275,46 +275,46 @@ else {
     $targetPaths = $Path
 }
 
-# å„ãƒ‘ã‚¹ã‚’å‡¦ç†
+# ŠeƒpƒX‚ğˆ—
 if (-not $cancelled) {
     foreach ($targetPath in $targetPaths) {
         if (-not (Test-Path $targetPath)) {
-            Write-Host "ãƒ‘ã‚¹ãŒå­˜åœ¨ã—ã¾ã›ã‚“: $targetPath" -ForegroundColor Red
+            Write-Host "ƒpƒX‚ª‘¶İ‚µ‚Ü‚¹‚ñ: $targetPath" -ForegroundColor Red
             continue
         }
 
         if (Test-Path $targetPath -PathType Container) {
-            # ãƒ•ã‚©ãƒ«ãƒ€ã®å ´åˆ
+            # ƒtƒHƒ‹ƒ_‚Ìê‡
             Convert-Folder -FolderPath $targetPath
         }
         else {
-            # ãƒ•ã‚¡ã‚¤ãƒ«ã®å ´åˆ
+            # ƒtƒ@ƒCƒ‹‚Ìê‡
             Convert-File -FilePath $targetPath
         }
     }
 
-    # ã‚¬ãƒ™ãƒ¼ã‚¸ã‚³ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³
+    # ƒKƒx[ƒWƒRƒŒƒNƒVƒ‡ƒ“
     [System.GC]::Collect()
     [System.GC]::WaitForPendingFinalizers()
 
-    # çµæœè¡¨ç¤º
+    # Œ‹‰Ê•\¦
     Write-Host "`n========================================" -ForegroundColor Cyan
-    Write-Host " å‡¦ç†çµæœ" -ForegroundColor Cyan
+    Write-Host " ˆ—Œ‹‰Ê" -ForegroundColor Cyan
     Write-Host "========================================" -ForegroundColor Cyan
-    Write-Host "æˆåŠŸ: $script:successCount ä»¶" -ForegroundColor Green
-    Write-Host "ã‚¹ã‚­ãƒƒãƒ—: $script:skipCount ä»¶" -ForegroundColor Yellow
-    Write-Host "ã‚¨ãƒ©ãƒ¼: $script:errorCount ä»¶" -ForegroundColor Red
+    Write-Host "¬Œ÷: $script:successCount Œ" -ForegroundColor Green
+    Write-Host "ƒXƒLƒbƒv: $script:skipCount Œ" -ForegroundColor Yellow
+    Write-Host "ƒGƒ‰[: $script:errorCount Œ" -ForegroundColor Red
 
     if ($script:errorFiles.Count -gt 0) {
-        Write-Host "`nã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ãŸãƒ•ã‚¡ã‚¤ãƒ«:" -ForegroundColor Red
+        Write-Host "`nƒGƒ‰[‚ª”­¶‚µ‚½ƒtƒ@ƒCƒ‹:" -ForegroundColor Red
         foreach ($f in $script:errorFiles) {
             Write-Host "  - $f" -ForegroundColor Red
         }
     }
 
-    Write-Host "`nå‡¦ç†ãŒå®Œäº†ã—ã¾ã—ãŸã€‚"
+    Write-Host "`nˆ—‚ªŠ®—¹‚µ‚Ü‚µ‚½B"
 }
 
-# çµ‚äº†æ™‚ã¯å¿…ãšã“ã“ã‚’é€šã‚‹
+# I—¹‚Í•K‚¸‚±‚±‚ğ’Ê‚é
 Write-Host ""
 pause
